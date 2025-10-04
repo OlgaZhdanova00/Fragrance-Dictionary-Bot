@@ -270,6 +270,10 @@ class PerfumeDatabase:
             
             return stats
     
+    def get_database_stats(self) -> Dict:
+        """Алиас для get_stats() для совместимости"""
+        return self.get_stats()
+    
     def backup_database(self, backup_path: str = None) -> str:
         """Создает резервную копию базы данных"""
         if not backup_path:
@@ -285,6 +289,12 @@ class PerfumeDatabase:
         import shutil
         shutil.copy2(self.db_path, backup_path)
         return backup_path
+    
+    def close(self):
+        """Закрытие соединения с базой данных (для совместимости)"""
+        # SQLite автоматически закрывает соединения при использовании контекстного менеджера
+        # Этот метод добавлен для совместимости с кодом, который ожидает метод close()
+        pass
 
 # Функция для инициализации базы данных с начальными данными
 def populate_initial_data(db: PerfumeDatabase):
