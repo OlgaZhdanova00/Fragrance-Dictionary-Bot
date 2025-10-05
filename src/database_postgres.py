@@ -2,8 +2,8 @@
 Модуль для работы с PostgreSQL базой данных
 Содержит все функции для управления парфюмерными терминами
 """
-import psycopg2
-import psycopg2.extras
+import psycopg
+from psycopg.rows import dict_row
 import os
 import json
 from datetime import datetime
@@ -18,7 +18,7 @@ class PerfumeDatabase:
     
     def get_connection(self):
         """Создает соединение с PostgreSQL"""
-        return psycopg2.connect(self.db_url, cursor_factory=psycopg2.extras.RealDictCursor)
+        return psycopg.connect(self.db_url, row_factory=dict_row)
     
     def init_database(self):
         """Инициализация структуры базы данных"""
