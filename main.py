@@ -11,8 +11,8 @@ from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQu
 # Добавляем папку src в path для импорта модулей
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from src.config import BOT_TOKEN, ADMIN_USER_IDS, validate_config, DEBUG
-from src.database import PerfumeDatabase
+from config import BOT_TOKEN, ADMIN_USER_IDS, validate_config, DEBUG
+from database import PerfumeDatabase
 
 # Настройка логирования
 logging.basicConfig(
