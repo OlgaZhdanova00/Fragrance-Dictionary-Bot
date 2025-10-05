@@ -136,7 +136,7 @@ class PerfumeDatabase:
                 
                 exact_match = cursor.fetchall()
                 if exact_match:
-                    return [dict(row) for row in exact_match]
+                    return list(exact_match)
                 
                 # 2. Поиск по синонимам
                 cursor.execute('''
@@ -151,7 +151,7 @@ class PerfumeDatabase:
                 
                 synonym_results = cursor.fetchall()
                 if synonym_results:
-                    return [dict(row) for row in synonym_results]
+                    return list(synonym_results)
                 
                 # 3. Частичное совпадение в названии
                 cursor.execute('''
@@ -165,7 +165,7 @@ class PerfumeDatabase:
                 
                 partial_results = cursor.fetchall()
                 if partial_results:
-                    return [dict(row) for row in partial_results]
+                    return list(partial_results)
                 
                 # 4. Поиск в определениях
                 cursor.execute('''
@@ -178,7 +178,7 @@ class PerfumeDatabase:
                 ''', (f'%{query_lower}%', limit))
                 
                 definition_results = cursor.fetchall()
-                return [dict(row) for row in definition_results]
+                return list(definition_results)
     
     def get_random_term(self) -> Optional[Dict]:
         """Получает случайный термин"""
@@ -192,7 +192,7 @@ class PerfumeDatabase:
                     LIMIT 1
                 ''')
                 result = cursor.fetchone()
-                return dict(result) if result else None
+                return result if result else None
     
     def get_categories(self) -> List[Dict]:
         """Получает все категории"""
@@ -205,7 +205,7 @@ class PerfumeDatabase:
                     GROUP BY c.id, c.name, c.description, c.created_at
                     ORDER BY c.name
                 ''')
-                return [dict(row) for row in cursor.fetchall()]
+                return list(cursor.fetchall())
     
     def get_terms_by_category(self, category_id: int) -> List[Dict]:
         """Получает термины по категории"""
@@ -218,7 +218,7 @@ class PerfumeDatabase:
                     WHERE t.category_id = %s
                     ORDER BY t.term
                 ''', (category_id,))
-                return [dict(row) for row in cursor.fetchall()]
+                return list(cursor.fetchall())
     
     def increment_usage(self, term_id: int):
         """Увеличивает счетчик использования термина"""
