@@ -11,8 +11,12 @@ from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQu
 # Добавляем папку src в path для импорта модулей
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from config import BOT_TOKEN, ADMIN_USER_IDS, validate_config, DEBUG
-from database import PerfumeDatabase
+from config import BOT_TOKEN, ADMIN_USER_IDS, validate_config, DEBUG, DATABASE_URL
+# Выбираем тип базы данных в зависимости от наличия DATABASE_URL
+if DATABASE_URL:
+    from database_postgres import PerfumeDatabase
+else:
+    from database import PerfumeDatabase
 
 # Настройка логирования
 logging.basicConfig(
