@@ -639,8 +639,19 @@ async def setup_bot_commands(application):
 def main():
     """Главная функция запуска бота"""
     import asyncio
+    import fcntl
     from threading import Thread
     from http.server import HTTPServer, BaseHTTPRequestHandler
+    
+    # Проверяем, не запущен ли уже бот
+    lock_file = "bot.lock"
+    try:
+        lock_fd = os.open(lock_file, os.O_CREAT | os.O_WRONLY | os.O_TRUNC)
+        fcntl.flock(lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        logger.info("🔒 Блокировка файла получена - бот не запущен")
+    except (OSError, IOError):
+        logger.error("❌ Бот уже запущен! Остановите другой экземпляр.")
+        sys.exit(1)
     
     logger.info("🚀 Запуск бота...")
     
@@ -716,7 +727,16 @@ def main():
     app.post_init = post_init
     
     # Запускаем бота
-    app.run_polling(drop_pending_updates=True)
+    try:
+        app.run_polling(drop_pending_updates=True)
+    finally:
+        # Очищаем блокировку при завершении
+        try:
+            os.close(lock_fd)
+            os.unlink(lock_file)
+            logger.info("🔓 Блокировка файла освобождена")
+        except:
+            pass
 
 if __name__ == "__main__":
     main()
