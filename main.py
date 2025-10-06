@@ -11,12 +11,9 @@ from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQu
 # Добавляем папку src в path для импорта модулей
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from config import BOT_TOKEN, ADMIN_USER_IDS, validate_config, DEBUG, DATABASE_URL
-# Выбираем тип базы данных в зависимости от наличия DATABASE_URL
-if DATABASE_URL:
-    from database_postgres import PerfumeDatabase
-else:
-    from database import PerfumeDatabase
+from config import BOT_TOKEN, ADMIN_USER_IDS, validate_config, DEBUG
+from database import PerfumeDatabase
+from external_storage import ExternalStorage
 
 # Настройка логирования
 logging.basicConfig(
@@ -32,6 +29,7 @@ class PerfumeBot:
     def __init__(self):
         """Инициализация бота"""
         self.db = db
+        self.storage = ExternalStorage()
         
     async def start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """Обработчик команды /start"""
@@ -227,6 +225,7 @@ class PerfumeBot:
         if not results:
             # Логируем неуспешный поиск
             self.db.log_search(user_id, query, found=False)
+            self.storage.log_search(user_id, query, found=False)
             
             await update.message.reply_text(
                 f"❌ Термин '*{query}*' не найден.\n\n"
@@ -243,6 +242,7 @@ class PerfumeBot:
             # Найден один термин - показываем его
             term = results[0]
             self.db.log_search(user_id, query, term['id'], found=True)
+            self.storage.log_search(user_id, query, found=True)
             self.db.increment_usage(term['id'])
             await self.send_term_info(update, term)
         else:
