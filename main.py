@@ -638,11 +638,29 @@ async def setup_bot_commands(application):
 
 def main():
     """Главная функция запуска бота"""
-    import fcntl
-    import sys
+    import asyncio
+    from threading import Thread
+    from http.server import HTTPServer, BaseHTTPRequestHandler
     
-    # Временно отключаем lock-механизм для решения конфликта
     logger.info("🚀 Запуск бота...")
+    
+    # Простой HTTP сервер для Render
+    class HealthHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header('Content-type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b'Bot is running!')
+        
+        def log_message(self, format, *args):
+            pass  # Отключаем логи HTTP сервера
+    
+    # Запуск HTTP сервера в отдельном потоке
+    port = int(os.environ.get('PORT', 10000))
+    httpd = HTTPServer(('0.0.0.0', port), HealthHandler)
+    http_thread = Thread(target=httpd.serve_forever, daemon=True)
+    http_thread.start()
+    logger.info(f"HTTP сервер запущен на порту {port}")
     
     # Настройка продакшена при первом запуске
     if not os.path.exists("data"):
