@@ -56,3 +56,9 @@ Thumbs.db
 get_user_id.py
 test_database.py
 deploy_commands.txt
+force_reset.py
+reset_bot.py
+test_connection.py
+restart_bot.sh
+requirements_*.txt
+env_temp.txt
