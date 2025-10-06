@@ -1,5 +1,6 @@
 # Переменные окружения
 .env
+.env_new
 .env_temp
 env_temp.txt
 
