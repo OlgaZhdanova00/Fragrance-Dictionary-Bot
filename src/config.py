@@ -24,7 +24,6 @@ if ADMIN_USER_IDS_STR:
 
 # Настройки базы данных
 DATABASE_PATH = os.getenv('DATABASE_PATH', 'data/database.db')
-DATABASE_URL = os.getenv('DATABASE_URL')  # PostgreSQL connection string
 
 # Настройки логирования
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')

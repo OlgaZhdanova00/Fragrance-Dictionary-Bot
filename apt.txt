@@ -1,6 +1,0 @@
-libpq-dev
-python3-dev
-gcc
-build-essential
-python3.11
-python3.11-dev
