@@ -2,8 +2,8 @@
 Модуль для работы с PostgreSQL базой данных
 Содержит все функции для управления парфюмерными терминами
 """
-import psycopg
-from psycopg.rows import dict_row
+import psycopg2
+import psycopg2.extras
 import os
 import json
 from datetime import datetime
@@ -18,7 +18,7 @@ class PerfumeDatabase:
     
     def get_connection(self):
         """Создает соединение с PostgreSQL"""
-        return psycopg.connect(self.db_url, row_factory=dict_row)
+        return psycopg2.connect(self.db_url, cursor_factory=psycopg2.extras.RealDictCursor)
     
     def init_database(self):
         """Инициализация структуры базы данных"""
@@ -136,7 +136,7 @@ class PerfumeDatabase:
                 
                 exact_match = cursor.fetchall()
                 if exact_match:
-                    return list(exact_match)
+                    return [dict(row) for row in exact_match]
                 
                 # 2. Поиск по синонимам
                 cursor.execute('''
@@ -192,7 +192,7 @@ class PerfumeDatabase:
                     LIMIT 1
                 ''')
                 result = cursor.fetchone()
-                return result if result else None
+                return dict(result) if result else None
     
     def get_categories(self) -> List[Dict]:
         """Получает все категории"""
@@ -205,7 +205,7 @@ class PerfumeDatabase:
                     GROUP BY c.id, c.name, c.description, c.created_at
                     ORDER BY c.name
                 ''')
-                return list(cursor.fetchall())
+                return [dict(row) for row in cursor.fetchall()]
     
     def get_terms_by_category(self, category_id: int) -> List[Dict]:
         """Получает термины по категории"""
@@ -218,7 +218,7 @@ class PerfumeDatabase:
                     WHERE t.category_id = %s
                     ORDER BY t.term
                 ''', (category_id,))
-                return list(cursor.fetchall())
+                return [dict(row) for row in cursor.fetchall()]
     
     def increment_usage(self, term_id: int):
         """Увеличивает счетчик использования термина"""
