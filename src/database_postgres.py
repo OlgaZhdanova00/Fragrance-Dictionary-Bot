@@ -18,12 +18,12 @@ class PerfumeDatabase:
     
     def get_connection(self):
         """Создает соединение с PostgreSQL"""
-        return psycopg2.connect(self.db_url, cursor_factory=psycopg2.extras.RealDictCursor)
+        return pg8000.native.Connection(self.db_url)
     
     def init_database(self):
         """Инициализация структуры базы данных"""
-        with self.get_connection() as conn:
-            with conn.cursor() as cursor:
+        conn = self.get_connection()
+        try:
                 # Создаем таблицу категорий
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS categories (
